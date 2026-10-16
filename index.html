@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#101b28" />
+  <meta name="description" content="مِيقات — ساعة زمنية تفاعلية تقرأ اليوم بمواقيت الشمس، والتاريخ الهجري، والهدي النبوي الموثّق." />
+  <title>مِيقات | ساعة اليوم والهدي النبوي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="مِيقات، الصفحة الرئيسية">
+        <span class="brand-mark" aria-hidden="true">۞</span>
+        <span><span class="brand-name">مِيقات</span><span class="brand-caption">الساعة الزمانية</span></span>
+      </a>
+      <div class="topbar-actions">
+        <span id="dataStatus" class="status"><span class="status-dot"></span>جاري تحميل المواقيت</span>
+        <button class="settings-button" id="openSettings" type="button" aria-label="إعدادات الموقع والمواقيت">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 13a7 7 0 0 0 0-2l2-1.5-2-3.5-2.3.9A7 7 0 0 0 15 6l-.5-2.5h-4L10 6a7 7 0 0 0-1.7.9L6 6l-2 3.5L6 11a7 7 0 0 0 0 2l-2 1.5L6 18l2.3-.9A7 7 0 0 0 10 18l.5 2.5h4L15 18a7 7 0 0 0 1.7-.9L19 18l2-3.5z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="date-strip">
+        <div>
+          <span class="eyebrow">الزمن الذي نعيشه الآن</span>
+          <h1>لكلِّ وقتٍ <em>هَدْي</em></h1>
+          <p class="intro">تأمّل ساعات يومك على ضوء الشمس، واستحضر ما ثبت من سنن النبي ﷺ في أوقاتها.</p>
+        </div>
+        <div class="date-summary">
+          <span class="date-kicker" id="hijriDayPhase">التاريخ الهجري</span>
+          <span class="hijri-date" id="hijriDate">جارٍ تحديد التاريخ…</span>
+          <span class="greg-date" id="gregDate">—</span>
+          <span class="location" id="locationLabel">◉ الرياض، السعودية</span>
+        </div>
+      </div>
+
+      <section class="hero" aria-label="الساعة الزمانية الحية">
+        <div class="clock-side notes-panel">
+          <div class="mini-label"><span class="tiny-sun">✳</span> الشروق والغروب</div>
+          <div class="sun-row"><span>الشروق</span><strong id="sunriseValue">--:--</strong></div>
+          <div class="sun-row"><span>الغروب</span><strong id="sunsetValue">--:--</strong></div>
+          <div class="fine-rule"></div>
+          <div class="mini-label">طول الساعة الزمانية اليوم</div>
+          <div class="hour-length"><span>نهارًا</span><strong id="dayLength">—</strong></div>
+          <div class="hour-length"><span>ليلًا</span><strong id="nightLength">—</strong></div>
+          <p class="side-footnote">تختلف مدة الساعة بتغيّر طول النهار والليل على مدار السنة.</p>
+        </div>
+
+        <div class="clock-column">
+          <div class="clock-topline"><span>القرص الزمني</span><span id="phaseTag" class="phase-tag">يُحدّد الآن…</span></div>
+          <div class="clock-outer" id="clockOuter">
+            <svg id="clockSvg" class="clock-svg" viewBox="0 0 500 500" role="img" aria-label="قرص يوضح تقسيم الليل والفجر والنهار والوقت الحالي">
+              <defs>
+                <linearGradient id="dayGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e5c98d"/><stop offset="1" stop-color="#aa804b"/></linearGradient>
+                <linearGradient id="dawnGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d6ada7"/><stop offset="1" stop-color="#f2d3ae"/></linearGradient>
+                <filter id="pointerGlow"><feGaussianBlur stdDeviation="4"/></filter>
+              </defs>
+              <circle cx="250" cy="250" r="215" fill="none" stroke="#d7cbb6" stroke-opacity=".16" stroke-width="1"/>
+              <circle cx="250" cy="250" r="192" fill="none" stroke="#f8ead1" stroke-opacity=".08" stroke-width="26"/>
+              <g id="segments"></g>
+              <g id="ticks"></g>
+              <circle cx="250" cy="250" r="157" fill="none" stroke="#e6dcc8" stroke-opacity=".14" stroke-width="1"/>
+              <circle cx="250" cy="250" r="143" fill="none" stroke="#e6dcc8" stroke-opacity=".07" stroke-width="1" stroke-dasharray="2 6"/>
+              <g id="clockHand"><line x1="250" y1="93" x2="250" y2="44" stroke="#e8bc78" stroke-width="2.4" stroke-linecap="round"/><circle cx="250" cy="60" r="6.5" fill="#ead09d"/></g>
+            </svg>
+            <div class="clock-center" aria-live="off">
+              <span class="clock-ornament">۞</span>
+              <span class="current-period" id="currentPeriod">الوقت الزماني</span>
+              <strong class="current-hour" id="temporalHour">—</strong>
+              <span class="current-part" id="temporalFraction">من الساعة الجارية</span>
+              <div class="center-divider"></div>
+              <span class="center-prompt">من هدي النبي ﷺ</span>
+              <span class="center-sunnah" id="centerSunnah">تظهر السنن المناسبة لهذا الوقت</span>
+            </div>
+          </div>
+          <div class="clock-legend"><span><i class="legend-dot night-dot"></i> الليل</span><span><i class="legend-dot dawn-dot"></i> الفجر</span><span><i class="legend-dot day-dot"></i> النهار</span></div>
+          <div class="civil-time">
+            <span>التوقيت المعتاد</span>
+            <strong id="regularTime" dir="ltr">--:--:--</strong>
+            <span id="regularPeriod">—</span>
+          </div>
+          <p class="clock-disclaimer">تقسيم الساعات الزمانية وسيلة حسابية، وليس ترقيمًا تعبديًا ورد عن النبي ﷺ. فترة الفجر إلى الشروق معروضة مستقلة.</p>
+        </div>
+
+        <div class="clock-side next-panel">
+          <div class="mini-label"><span class="tiny-star">✦</span> الصلاة القادمة</div>
+          <strong class="next-prayer-name" id="nextPrayerName">—</strong>
+          <strong class="next-prayer-time" id="nextPrayerTime">--:--</strong>
+          <div class="countdown-label">متبقٍّ على الأذان</div>
+          <div class="countdown" id="countdown">--:--:--</div>
+          <div class="fine-rule"></div>
+          <div class="mini-label">مراحل الليل الشرعي</div>
+          <div class="sun-row"><span>منتصف الليل</span><strong id="midnightTime">--:--</strong></div>
+          <div class="sun-row"><span>الثلث الأخير</span><strong id="lastThirdTime">--:--</strong></div>
+          <p class="side-footnote">يُحسب الليل الشرعي هنا من الغروب إلى الفجر الصادق.</p>
+        </div>
+      </section>
+
+      <section class="guidance-block" id="guidance" aria-label="السنن المناسبة للوقت الحالي">
+        <div class="section-heading">
+          <div><span class="eyebrow">اعمل بسُنّته</span><h2>ما يُستحبّ في هذا الوقت</h2></div>
+          <span class="section-pill" id="guidancePhase">حسب الوقت الحالي</span>
+        </div>
+        <div class="sunnah-grid" id="sunnahGrid"><div class="loading-card">جارٍ تحديد السنن الموافقة للمواقيت…</div></div>
+        <p class="reference-note">الأعمال هنا مقترحات مستندة إلى نصوص صحيحة أو آيات، وليست برنامجًا ثابتًا لكل رقم من ساعات اليوم. افتح «الدليل» لمعرفة المصدر.</p>
+      </section>
+
+      <section class="prayers-section" aria-label="مواقيت الصلاة اليومية">
+        <div class="section-heading"><div><span class="eyebrow">ميزان اليوم</span><h2>مواقيت الصلاة</h2></div><span class="section-pill" id="prayerDate">اليوم</span></div>
+        <div class="prayer-grid" id="prayersList"></div>
+      </section>
+
+      <section class="explainer">
+        <div class="explainer-symbol" aria-hidden="true">۞</div>
+        <div><span class="eyebrow">كيف تُقرأ هذه الساعة؟</span><h2>الوقت يتبدّل، والهدي ثابت.</h2><p>نقسم الفترة بين <b>الشروق والغروب</b> إلى 12 ساعة نهارية، والفترة بين <b>الغروب والفجر</b> إلى 12 ساعة ليلية بحسب التعريف المعتمد في هذه التجربة، مع فصل وقت الفجر حتى الشروق. قد تكون الساعة الزمانية أطول أو أقصر من ستين دقيقة. يتجدد الحساب يوميًا بحسب المدينة، ويبدأ التاريخ الهجري الجديد عند الغروب.</p><a href="https://aladhan.com/prayer-times-api" target="_blank" rel="noopener noreferrer" class="text-link">مصدر حساب المواقيت ↗</a></div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>مِيقات — اجعل للوقت نصيبًا من السُّنَّة.</span><span>مواقيت تقريبية وفق طريقة الحساب المختارة؛ يُقدَّم التقويم المحلي المعتمد عند الاختلاف.</span></footer>
+  </div>
+
+  <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+    <form id="settingsForm" class="settings-form" method="dialog">
+      <div class="modal-heading"><div><span class="eyebrow">تخصيص التوقيت</span><h2 id="settingsTitle">إعدادات مِيقات</h2></div><button type="button" id="closeSettings" class="close-button" aria-label="إغلاق">×</button></div>
+      <label for="citySelect">المدينة</label>
+      <select id="citySelect" name="city">
+        <option value="riyadh">الرياض، السعودية</option>
+        <option value="makkah">مكة المكرمة، السعودية</option>
+        <option value="madinah">المدينة المنورة، السعودية</option>
+        <option value="jeddah">جدة، السعودية</option>
+        <option value="dammam">الدمام، السعودية</option>
+        <option value="dubai">دبي، الإمارات</option>
+        <option value="cairo">القاهرة، مصر</option>
+        <option value="istanbul">إسطنبول، تركيا</option>
+        <option value="kuala">كوالالمبور، ماليزيا</option>
+        <option value="london">لندن، المملكة المتحدة</option>
+        <option value="custom">موقعي الحالي (عبر المتصفح)</option>
+      </select>
+      <button id="locateButton" class="locate-button" type="button">⌖ استخدام موقعي الحالي</button>
+      <label for="methodSelect">طريقة حساب المواقيت</label>
+      <select id="methodSelect" name="method">
+        <option value="4">أم القرى — مكة</option>
+        <option value="8">طريقة منطقة الخليج</option>
+        <option value="3">رابطة العالم الإسلامي</option>
+        <option value="5">الهيئة المصرية العامة للمساحة</option>
+        <option value="13">رئاسة الشؤون الدينية التركية</option>
+        <option value="17">الهيئة الماليزية (JAKIM)</option>
+        <option value="2">الجمعية الإسلامية لأمريكا الشمالية</option>
+      </select>
+      <p class="modal-note">الموقع الجغرافي اختياري. لا يُرفع الموقع إلى خوادمنا، لكن يُرسل خط العرض والطول إلى مزود أوقات الصلاة لحساب المواقيت. قد تختلف النتائج دقائق عن تقويم المسجد المحلي.</p>
+      <p id="settingsMessage" class="settings-message" aria-live="polite"></p>
+      <button type="submit" class="save-button">تطبيق الإعدادات</button>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
